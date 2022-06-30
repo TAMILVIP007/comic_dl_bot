@@ -54,10 +54,10 @@ def comic2Pdf(client, callback_query):
             f.write(img2pdf.convert(file_paths))
             f.close()
 
-        os.rename(r"{}.pdf".format(chat_id), r'{0}_{1}.pdf'.format(mangaTitle, chapNumber, chat_id))        
+        os.rename(r"{}.pdf".format(chat_id), r'{}_{}_{}pdf'.format(mangaTitle, chapNumber, chat_id))        
         client.send_document(chat_id=chat_id,
-                             document='{0}_{1}.pdf'.format(comicTitle, chapNumber, chat_id),
+                             document='{}_{}_{}.pdf'.format(comicTitle, chapNumber, chat_id),
                              caption=f""".""", parse_mode="markdown")    
 
         shutil.rmtree(f"Download")
-        os.remove('{0}_{1}.pdf'.format(comicTitle, chapNumber, chat_id))
+        os.remove('{}_{}_{}.pdf'.format(comicTitle, chapNumber, chat_id))
