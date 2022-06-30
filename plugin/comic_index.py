@@ -18,29 +18,35 @@ def comicindex(client, callback_query):
     lastChapList = []
     keyb = []
     number = 1
-    for links in chapters:        
+    for _ in chapters:
         chapterNo = number
         lastChapList.append(chapterNo)
         number = number + 1
     lastChapterNo = len(lastChapList)
-    if int(lastChapterNo) > 120:
-        listInitial = []
-        for i in range(0, int(lastChapterNo)):
-            listInitial.append(i)
+    if lastChapterNo > 120:
+        listInitial = list(range(lastChapterNo))
         n = 41
         listOrganisedInitial = [listInitial[i:i + n] for i in range(0, len(listInitial), n)]
-        listIndex = []
-        for item in listOrganisedInitial:
-            listIndex.append((InlineKeyboardButton(f"Ch {item[0]}-{item.pop()}", callback_data=f"but2_{listOrganisedInitial.index(item)}_{data}")))
+        listIndex = [
+            InlineKeyboardButton(
+                f"Ch {item[0]}-{item.pop()}",
+                callback_data=f"but2_{listOrganisedInitial.index(item)}_{data}",
+            )
+            for item in listOrganisedInitial
+        ]
+
         o = 3
         listIndexFinal = [listIndex[i:i + o] for i in range(0, len(listIndex), o)]
         repl = InlineKeyboardMarkup(listIndexFinal)
         callback_query.edit_message_text(f"""You selected **{title}**
 
 Select the Chapter""", reply_markup=repl, parse_mode="markdown")
-    elif int(lastChapterNo) < 120:
-        for i in range(0, int(lastChapterNo)):
-            keyb.append((InlineKeyboardButton(f"Ch {i}", callback_data=f"pdfr_{data}_{i}")))
+    elif lastChapterNo < 120:
+        keyb.extend(
+            InlineKeyboardButton(f"Ch {i}", callback_data=f"pdfr_{data}_{i}")
+            for i in range(lastChapterNo)
+        )
+
         o = 5
         listIndexFinal = [keyb[i:i + o] for i in range(0, len(keyb), o)]
         repl = InlineKeyboardMarkup(listIndexFinal)

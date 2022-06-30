@@ -18,19 +18,19 @@ def comicindex2(client, callback_query):
     chapters = chapters_div.find_all('tr')
     lastChapList = []
     number = 1
-    for links in chapters:        
+    for _ in chapters:
         chapterNo = number
         lastChapList.append(chapterNo)
         number = number + 1
     lastChapterNo = len(lastChapList)
-    listInitial = []
-    for i in range(0, int(lastChapterNo)):
-        listInitial.append(i)
+    listInitial = list(range(lastChapterNo))
     n = 41
     listOrganisedInitial = [listInitial[i:i + n] for i in range(0, len(listInitial), n)]
-    n = []
-    for kn in listOrganisedInitial[int(comicIndexNo)]:
-        n.append((InlineKeyboardButton(f'{kn}', callback_data=f"pdfr_{comic}_{kn}")))
+    n = [
+        InlineKeyboardButton(f'{kn}', callback_data=f"pdfr_{comic}_{kn}")
+        for kn in listOrganisedInitial[int(comicIndexNo)]
+    ]
+
     m = 5
     K = [n[i:i + m] for i in range(0, len(n), m)]
     kb = InlineKeyboardMarkup(K)
