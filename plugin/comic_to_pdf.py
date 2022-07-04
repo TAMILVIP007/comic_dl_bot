@@ -16,12 +16,10 @@ def comic2Pdf(client, callback_query):
     chapNumber = dtSplit[2]
     strSplit = comic.split("-")
     empty = " "
-    comicTitle = empty.join(strSplit).title()   
-    if os.path.exists(f"Download") == True:
-        shutil.rmtree(f"Download")
-        os.mkdir(f"Download")
-    else:
-        os.mkdir(f"Download")
+    comicTitle = empty.join(strSplit).title()
+    if os.path.exists("Download") == True:
+        shutil.rmtree("Download")
+    os.mkdir("Download")
     comiclink = f"https://www.comicextra.com/{comic}/chapter-{chapNumber}/full"
     response = requests.get(comiclink)
     plainText = response.text
@@ -32,18 +30,20 @@ def comic2Pdf(client, callback_query):
         comicUrlsSplit.append(url['src'])
         print(f"k {mangaUrlsSplit}")
         total = len(mangaUrlsSplit)
-        i = 1
-        for urls in comicUrlsSplit:   
-            callback_query.edit_message_text(f"""DOWNLOADING NOW\nProgress: `{round((int(i)/int(total)*100))}%`""", parse_mode="markdown")
-            print(f"n {urls}")       
+        for i, urls in enumerate(comicUrlsSplit, start=1):   
+            callback_query.edit_message_text(
+                f"""DOWNLOADING NOW\nProgress: `{round(int(i) / total * 100)}%`""",
+                parse_mode="markdown",
+            )
+
+            print(f"n {urls}")
             response = requests.get(urls)
             with open(f"Download/{i}.png", "wb") as pic:
                 pic.write(response.content)
                 pic.close()
-            i += 1       
         callback_query.edit_message_text("""Uploading Now""", parse_mode="markdown")
         file_paths = []
-        for root, directories, files in os.walk(f"Download"):
+        for root, directories, files in os.walk("Download"):
             for filename in files:
                 filepath = os.path.join(root, filename)
                 file_paths.append(filepath)
@@ -54,10 +54,18 @@ def comic2Pdf(client, callback_query):
             f.write(img2pdf.convert(file_paths))
             f.close()
 
-        os.rename(r"{}.pdf".format(chat_id), r'{0}_{1}.pdf'.format(mangaTitle, chapNumber, chat_id))        
-        client.send_document(chat_id=chat_id,
-                             document='{0}_{1}.pdf'.format(comicTitle, chapNumber, chat_id),
-                             caption=f""".""", parse_mode="markdown")    
+        os.rename(
+            f"{chat_id}.pdf",
+            r'{0}_{1}.pdf'.format(mangaTitle, chapNumber, chat_id),
+        )
 
-        shutil.rmtree(f"Download")
+        client.send_document(
+            chat_id=chat_id,
+            document='{0}_{1}.pdf'.format(comicTitle, chapNumber, chat_id),
+            caption=""".""",
+            parse_mode="markdown",
+        )
+            
+
+        shutil.rmtree("Download")
         os.remove('{0}_{1}.pdf'.format(comicTitle, chapNumber, chat_id))
